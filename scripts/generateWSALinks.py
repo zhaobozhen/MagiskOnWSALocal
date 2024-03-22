@@ -26,9 +26,9 @@ import warnings
 from pathlib import Path
 from threading import Thread
 from typing import OrderedDict
-from xml.dom import minidom
 
 from requests import Session
+import defusedxml.minidom
 
 
 class Prop(OrderedDict):
@@ -73,7 +73,7 @@ out = session.post(
     headers={'Content-Type': 'application/soap+xml; charset=utf-8'},
     verify=False
 )
-doc = minidom.parseString(out.text)
+doc = defusedxml.minidom.parseString(out.text)
 cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
 
 with open(Path.cwd().parent / "xml/WUIDRequest.xml", "r") as f:
@@ -86,7 +86,7 @@ out = session.post(
     verify=False
 )
 
-doc = minidom.parseString(html.unescape(out.text))
+doc = defusedxml.minidom.parseString(html.unescape(out.text))
 
 filenames = {}
 for node in doc.getElementsByTagName('Files'):
@@ -116,7 +116,7 @@ def send_req(i,v,out_file,out_file_name):
         headers={'Content-Type': 'application/soap+xml; charset=utf-8'},
         verify=False
     )
-    doc = minidom.parseString(out.text)
+    doc = defusedxml.minidom.parseString(out.text)
     for l in doc.getElementsByTagName("FileLocation"):
         url = l.getElementsByTagName("Url")[0].firstChild.nodeValue
         if len(url) != 99:
